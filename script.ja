@@ -1,0 +1,70 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const taskInput = document.getElementById('taskInput');
+    const addTaskButton = document.getElementById('addTaskButton');
+    const taskList = document.getElementById('taskList');
+
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+
+    const renderTasks = () => {
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => {
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.textContent = task;
+
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.classList.add('edit');
+            editButton.addEventListener('click', () => editTask(index));
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => deleteTask(index));
+
+            li.appendChild(span);
+            li.appendChild(editButton);
+            li.appendChild(deleteButton);
+
+            taskList.appendChild(li);
+        });
+    };
+
+    const addTask = () => {
+        const task = taskInput.value.trim();
+        if (task) {
+            tasks.push(task);
+            taskInput.value = '';
+            updateLocalStorage();
+            renderTasks();
+        }
+    };
+
+    const editTask = (index) => {
+        const newTask = prompt('Edit your task:', tasks[index]);
+        if (newTask !== null) {
+            tasks[index] = newTask.trim();
+            updateLocalStorage();
+            renderTasks();
+        }
+    };
+
+
+    const deleteTask = (index) => {
+        tasks.splice(index, 1);
+        updateLocalStorage();
+        renderTasks();
+    };
+
+ 
+    const updateLocalStorage = () => {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    };
+
+    addTaskButton.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTask();
+    });
+
+    renderTasks();
+});
